@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Personal Fitness Tracker</title>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<link rel="stylesheet" href="style.css">
+
+<body>
+  <header class="nav">
+    <div class="brand">
+      <div class="logo">PF</div>
+      <div>
+        <div style="font-weight:800">Personal Fitness</div>
+        <div class="muted" style="font-size:12px">Tracker & Trainer</div>
+      </div>
+    </div>
+
+    <nav class="navlinks" aria-label="Main navigation">
+      <a href="#dashboard">Dashboard</a>
+      <a href="#workouts">Workouts</a>
+      <a href="#nutrition">Nutrition</a>
+      <a href="#progress">Progress</a>
+      <a href="#profile">Profile</a>
+    </nav>
+
+    <div style="display:flex;gap:8px;align-items:center">
+      <button class="icon-btn" id="themeBtn">🌙</button>
+      <button class="cta" id="openProfile">Profile</button>
+      <button class="hamb" id="menuBtn">☰</button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section id="dashboard" class="card fade-up">
+      <h2 style="margin-top:0">Dashboard</h2>
+      <p class="muted">All-in-one hub: daily summary, quick actions and goals.</p>
+      <div style="height:14px"></div>
+      <div class="stats">
+        <div class="stat">
+          <div class="muted">Calories Today</div>
+          <strong id="calToday">0 kcal</strong>
+          <div class="muted">Goal: <span id="calGoalText">2000 kcal</span></div>
+        </div>
+        <div class="stat">
+          <div class="muted">Workouts This Week</div>
+          <strong id="wkCount">0</strong>
+          <div class="muted">Target: <span id="wkGoalText">3</span></div>
+        </div>
+        <div class="stat">
+          <div class="muted">Weight</div>
+          <strong id="curWeight">— kg</strong>
+          <div class="muted">Goal: <span id="weightGoalText">— kg</span></div>
+        </div>
+      </div>
+    </section>
+
+    <div class="grid" style="margin-top:18px">
+      <div>
+        <!-- Workouts -->
+        <section id="workouts" class="card fade-up">
+          <h3>Workouts</h3>
+          <p class="muted">Add, track and time your workouts.</p>
+
+          <form id="workoutForm" style="margin-top:10px">
+            <div class="row">
+              <div class="col">
+                <label>Title</label>
+                <input type="text" id="w-title" placeholder="e.g. Upper body HIIT" required>
+              </div>
+              <div class="col">
+                <label>Duration (mins)</label>
+                <input type="number" id="w-duration" min="1" value="30" required>
+              </div>
+            </div>
+            <div class="row" style="margin-top:8px">
+              <div class="col">
+                <label>Calories burned (est)</label>
+                <input type="number" id="w-cals" min="0" value="300">
+              </div>
+              <div class="col">
+                <label>Date</label>
+                <input type="date" id="w-date" value="">
+              </div>
+            </div>
+            <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+              <button class="btn" type="submit">Add workout</button>
+              <button type="button" class="btn secondary" id="startTimer">Start timer</button>
+              <div style="margin-left:auto" class="muted">Quick timers appear here: <span id="timerLabel">00:00</span>
+              </div>
+            </div>
+          </form>
+
+          <div style="height:14px"></div>
+          <div class="list" id="workoutList" aria-live="polite"></div>
+        </section>
+
+        <!-- Nutrition -->
+        <section id="nutrition" class="card fade-up" style="margin-top:14px">
+          <h3>Nutrition</h3>
+          <p class="muted">Log meals & calories.</p>
+
+          <form id="mealForm" style="margin-top:10px">
+            <div class="row">
+              <div class="col">
+                <label>Meal</label>
+                <input type="text" id="m-title" placeholder="Breakfast — Oatmeal + banana">
+              </div>
+              <div class="col">
+                <label>Calories</label>
+                <input type="number" id="m-cals" min="0" value="0">
+              </div>
+            </div>
+            <div style="margin-top:10px;display:flex;gap:8px;align-items:center">
+              <button class="btn" type="submit">Add meal</button>
+              <button type="button" class="btn secondary" id="quickBreakfast">+ Breakfast 400kcal</button>
+            </div>
+          </form>
+
+          <div style="height:12px"></div>
+          <div class="list" id="mealList"></div>
+        </section>
+
+        <!-- Progress (chart) -->
+        <section id="progress" class="card fade-up" style="margin-top:14px">
+          <h3>Progress</h3>
+          <p class="muted">Track weight over time and see trends.</p>
+          <div style="display:flex;gap:12px;align-items:center;margin-top:10px">
+            <form id="weightForm" style="display:flex;gap:8px;align-items:center">
+              <input type="date" id="weightDate" required>
+              <input type="number" id="weightVal" placeholder="kg" step="0.1" required>
+              <button class="btn" type="submit">Add</button>
+            </form>
+            <div style="margin-left:auto" class="muted">Entries: <span id="wCount">0</span></div>
+          </div>
+
+          <div style="height:12px"></div>
+          <canvas id="weightChart" style="max-height:260px"></canvas>
+        </section>
+      </div>
+
+      <aside>
+        <section class="card fade-up" id="quickActions">
+          <h3>Quick Goals</h3>
+          <p class="muted">Set daily calorie goal, weekly workout target and weight goal.</p>
+          <div style="height:8px"></div>
+          <label>Calories/day</label>
+          <input type="number" id="calGoal" value="2000">
+          <label style="margin-top:8px">Workouts / week</label>
+          <input type="number" id="wkGoal" value="3">
+          <label style="margin-top:8px">Target weight (kg)</label>
+          <input type="number" id="weightGoal" step="0.1" value="">
+          <div style="height:10px"></div>
+          <button class="btn" id="saveGoals">Save goals</button>
+        </section>
+
+        <section class="card fade-up" style="margin-top:12px">
+          <h3>Today's Summary</h3>
+          <div style="height:10px"></div>
+          <div class="muted">Calories</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:6px">
+            <div style="flex:1">
+              <div class="progress-bar"><span id="calProgress" style="width:0%"></span></div>
+            </div>
+            <div style="width:70px;text-align:right"><strong id="calNum">0 kcal</strong></div>
+          </div>
+
+          <div style="height:12px"></div>
+          <div class="muted">This week workouts</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-top:6px">
+            <div style="flex:1">
+              <div class="progress-bar"><span id="wkProgress" style="width:0%"></span></div>
+            </div>
+            <div style="width:70px;text-align:right"><strong id="wkNum">0</strong></div>
+          </div>
+        </section>
+
+        <section class="card fade-up" style="margin-top:12px">
+          <h3>Profile</h3>
+          <label>Name</label>
+          <input type="text" id="userName" placeholder="Your name">
+          <label style="margin-top:8px">Age</label>
+          <input type="number" id="userAge" min="8">
+          <label style="margin-top:8px">Height (cm)</label>
+          <input type="number" id="userHeight" min="70">
+          <div style="height:10px"></div>
+          <button class="btn" id="saveProfile">Save profile</button>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <footer>
+    Built with ❤️ — Personal Fitness Tracker • Local-first (uses your browser storage)
+  </footer>
+  <script src="js.js"></script>
+</body>
+
+</html>
